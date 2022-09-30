@@ -1,0 +1,27 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-sharedbook-dev-192911-authRole",
+      "UnauthRoleArn": "arn:aws:iam::200468223018:role/amplify-sharedbook-dev-192911-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::200468223018:role/amplify-sharedbook-dev-192911-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-sharedbook-dev-192911-deployment",
+      "UnauthRoleName": "amplify-sharedbook-dev-192911-unauthRole",
+      "StackName": "amplify-sharedbook-dev-192911",
+      "StackId": "arn:aws:cloudformation:us-east-1:200468223018:stack/amplify-sharedbook-dev-192911/cf6df010-32c8-11ed-9dfa-0ac118ab9b2b",
+      "AmplifyAppId": "d3g4c0h1nxwlbt"
+    },
+    "categories": {
+      "auth": {
+        "true": {},
+        "sharedbooke23c9b9f": {}
+      },
+      "function": {
+        "S3Triggere1f40b9a": {
+          "deploymentBucketName": "amplify-sharedbook-dev-192911-deployment",
+          "s3Key": "amplify-builds/S3Triggere1f40b9a-4f4547626a434d755545-build.zip"
+        }
+      }
+    }
+  }
+}

@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import Home from './components/Home';
+import Dashboard from './components/Dashboard';
+import NavBar from './components/navbar';
+import '@aws-amplify/ui-react/styles.css';
 
-function App() {
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes
+} from "react-router-dom";
+import AddBook from './components/Book';
+
+import { Amplify} from 'aws-amplify';
+import awsconfig from './aws-exports';
+import { Grid } from 'semantic-ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
+import Books from './components/Books';
+import SingleBook from './components/SingleBook';
+Amplify.configure(awsconfig);
+
+
+function App({signOut, user}) {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <NavBar user={user}/>
+      <Grid columns='one'>
+        <Grid.Row>
+          <Grid.Column>
+            <Routes>
+                <Route exact path="/"  element={<Home />} />
+                <Route exact path="/books"  element={<Books />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/books/:id" element={<SingleBook />} />
+                <Route path="/create-annonce" element={<AddBook />} />
+            </Routes>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+      
+    </Router>
   );
 }
 
-export default App;
+export default withAuthenticator(App);
+
+
+

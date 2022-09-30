@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "apiName": "sharedbook",
+    "serviceName": "AppSync",
+    "defaultAuthType": {
+      "mode": "API_KEY",
+      "expirationTime": 7,
+      "apiKeyExpirationDate": "2022-10-02T15:32:42.531Z",
+      "keyDescription": "Dev API"
+    },
+    "conflictResolution": {},
+    "additionalAuthTypes": []
+  }
+}
