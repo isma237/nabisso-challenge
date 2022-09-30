@@ -27,6 +27,7 @@ export const searchBooks = /* GraphQL */ `
         ownerName
         categoryId
         targetId
+        findBook
         createdAt
         updatedAt
       }
@@ -183,7 +184,11 @@ export const getBook = /* GraphQL */ `
         createdAt
         updatedAt
       }
+      findBook
       comments {
+        nextToken
+      }
+      discussion {
         nextToken
       }
       createdAt
@@ -213,6 +218,7 @@ export const listBooks = /* GraphQL */ `
           id
           label
         }
+        findBook
         createdAt
         updatedAt
       }
@@ -246,6 +252,101 @@ export const listComments = /* GraphQL */ `
         bookId
         ownerId
         ownerName
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getDiscussion = /* GraphQL */ `
+  query GetDiscussion($id: ID!) {
+    getDiscussion(id: $id) {
+      id
+      bookId
+      book {
+        id
+        name
+        description
+        picture_key
+        ownerId
+        ownerName
+        categoryId
+        targetId
+        findBook
+        createdAt
+        updatedAt
+      }
+      name
+      receiverId
+      senderId
+      messages {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listDiscussions = /* GraphQL */ `
+  query ListDiscussions(
+    $filter: ModelDiscussionFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listDiscussions(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        bookId
+        name
+        receiverId
+        senderId
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getMessage = /* GraphQL */ `
+  query GetMessage($id: ID!) {
+    getMessage(id: $id) {
+      id
+      discussionId
+      discussion {
+        id
+        bookId
+        name
+        receiverId
+        senderId
+        createdAt
+        updatedAt
+      }
+      content
+      senderId
+      senderName
+      receiverId
+      receiverName
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listMessages = /* GraphQL */ `
+  query ListMessages(
+    $filter: ModelMessageFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listMessages(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        discussionId
+        content
+        senderId
+        senderName
+        receiverId
+        receiverName
         createdAt
         updatedAt
       }

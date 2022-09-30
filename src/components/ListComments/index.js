@@ -1,6 +1,22 @@
 import { Container, Grid, Comment, Header } from "semantic-ui-react";
 import moment from "moment";
+import { Auth } from "aws-amplify";
+import { useEffect, useState } from "react";
 const ListComments = props => {
+
+    const [user, setUser] = useState({});
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    async function fetchData () {
+        const {attributes} = await Auth.currentAuthenticatedUser();
+        setUser(attributes)
+    }
+
+    const handleUpdate = (e, comment) => {
+        props.handleUpdateComment(comment)
+    }
     return (
         <Container>
             <Grid width={16}>
@@ -17,6 +33,11 @@ const ListComments = props => {
                                         <div>{moment(comment.createdAt).fromNow()}</div>
                                         </Comment.Metadata>
                                         <Comment.Text>{comment.content}</Comment.Text>
+                                        {user.sub !== undefined && user.sub === comment.ownerId && 
+                                            <Comment.Actions>
+                                                <Comment.Action onClick={e => handleUpdate(e, comment)}>Update</Comment.Action>
+                                            </Comment.Actions>
+                                        }
                                     </Comment.Content>
                                 </Comment>
                             )}

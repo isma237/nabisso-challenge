@@ -1,13 +1,14 @@
-import { Container, Grid, Header, Icon, Image, Item, Label, Loader } from "semantic-ui-react"
+import { Button, Container, Divider, Grid, Header, Icon, Image, Item, Label, Loader } from "semantic-ui-react"
 import { useState, useEffect } from "react";
 import { API, graphqlOperation, Storage, Auth } from "aws-amplify";
-import { getBook, listBooks, listComments } from "../../graphql/queries";
-import { createComment } from '../../graphql/mutations'
+import { getBook, listBooks, listComments, listDiscussions } from "../../graphql/queries";
+import { createComment, updateComment, createDiscussion } from '../../graphql/mutations'
 import moment from "moment";
 
 import {
     Link,
-    useParams
+    useParams,
+    useNavigate
   } from "react-router-dom";
 import Book from "../Book/Book";
 import CreateComment from "../CreateComment";
@@ -15,14 +16,18 @@ import ListComments from "../ListComments";
 
 const SingleBook = (props) => {
 
+    const initialState = {content: ''}
     let { id } = useParams();
     const [bookId, setBookId] = useState(id);
+    const [user, setUser] = useState(null);
     const [book, setBook] = useState({});
     const [booksInCategory, setBooksInCategory] = useState([]);
     const [loading, setLoading] = useState(false);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState(false);
+    const [comment, setComment] = useState({initialState});
 
+    const navigate = useNavigate()
 
     const formatListBooks = (data) => {
         const books = []
@@ -49,6 +54,10 @@ const SingleBook = (props) => {
         result = result.data.getBook
         const signedUrl = await Storage.get(result.picture_key);
         result['picture_url'] = signedUrl;
+
+
+        const attributes = await Auth.currentAuthenticatedUser()
+        setUser(attributes)
 
         const results = await API.graphql(graphqlOperation(listComments, 
             {filter : {bookId: {eq: bookId}}},
@@ -84,19 +93,78 @@ const SingleBook = (props) => {
                     bookId: bookId
                 }
             }))
-            //console.log(result)
             setNewComment(true)
             setLoading(false)
             setComments([...comments, result.data.createComment])
         }catch(error) {
-            console.log(error)
+            setLoading(false)
+        }
+    }
+
+    const handleUpdate = (info) => {
+        setComment(info)
+    }
+
+    const initiateDiscussion = async () => {
+        //TODO Create Discussion
+        let name = `${user.username}-${book.ownerName}-${book.name}`
+        const data = await checkIfDiscussionExist(name)
+        if(data.length === 0){
+            const disc = await API.graphql(graphqlOperation(createDiscussion, {
+                input: {
+                    ownerName: name,
+                    bookId: book.id,
+                    receiverId: book.ownerId,
+                    senderId: user.attributes.sub
+                }
+            }))
+            navigate(`/books/${book.id}/discussions/${disc.data.createDiscussion.id}`)
+        }else{
+            navigate(`/books/${book.id}/discussions/${data[0].id}`)
+        }
+        //TODO Change the Page
+        
+    }
+
+
+    const checkIfDiscussionExist = async (name) => {
+        const result = await API.graphql(graphqlOperation(listDiscussions, {filter: {ownerName: {eq: name}}}))
+        return result.data.listDiscussions.items;
+    }
+
+    const handleUpdateComment = async (formData) => {
+        setLoading(true)
+        try{
+            const result = await API.graphql(graphqlOperation(updateComment, {
+                input: {
+                    id: formData.id,
+                    content: formData.content
+                }
+            }))
+    
+            const newComments = comments.map(comment => {
+                if(comment.id === result.data.updateComment.id){
+                    return {...comment, content: result.data.updateComment.content}
+                }
+                return  comment
+            });
+            setComments(newComments);
+            setNewComment(true)
+            setLoading(false)
+        }catch(error) {
             setLoading(false)
         }
     }
 
     useEffect(() => {
         fetchData()
-    }, []);
+    }, [book]);
+
+
+    useEffect(() => {
+        setBookId(id)
+        setBook({})
+    }, [id]);
 
     return (
         <>
@@ -107,6 +175,17 @@ const SingleBook = (props) => {
                         <Grid.Row columns={16}>
                             <Grid.Column width={10}>
                                 <Header as='h1' color="blue">{book.name}</Header>
+                                {book.ownerId !== user.sub && 
+                                    <Grid.Row style={{margin: "1rem 0"}}>
+                                        <Grid.Column>
+                                            <Button 
+                                                color="orange"
+                                                size="mini"
+                                                onClick={initiateDiscussion}
+                                            ><Icon name='mail outline' size="big" />Private Discussion</Button>
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                }
                                 <Grid.Row columns="one">
                                     <Grid.Column>
                                         <Label basic color="teal"><Icon name='book' /> {book.category.name}</Label>
@@ -116,7 +195,14 @@ const SingleBook = (props) => {
                                     </Grid.Column>
                                 </Grid.Row>
                                 <Grid.Row columns="one" style={{marginTop: "1rem"}}>
-                                    <Image src={book.picture_url} alt="Book Picture" />
+                                    <Grid.Column>
+                                        <Header color="yellow">I find a book : <Label basic>Title: {book.findBook}</Label></Header>
+                                    </Grid.Column>
+                                    <Divider />
+                                    <Grid.Column>
+                                        <Image src={book.picture_url} alt="Book Picture" />
+                                    </Grid.Column>
+                                    
                                 </Grid.Row>
                                 <Grid.Row columns="one" style={{marginTop: "1rem"}}>
                                     <Grid.Column>
@@ -150,7 +236,12 @@ const SingleBook = (props) => {
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>
-                    <CreateComment createComment={handleCreateComment} loading={loading}/>
+                    <CreateComment
+                        newComment={newComment}
+                        createComment={handleCreateComment} 
+                        updateComment={handleUpdateComment}
+                        loading={loading} 
+                        initialState={comment}/>
                 </>
             : 
             <Grid.Column width={16} textAlign='center'>
@@ -159,7 +250,7 @@ const SingleBook = (props) => {
         }
         </Container>
 
-        {book.name && <ListComments comments={comments}/>}
+        {book.name && <ListComments comments={comments} handleUpdateComment={handleUpdate}/>}
         </>
        
     )

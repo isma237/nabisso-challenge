@@ -1,45 +1,25 @@
 import { useState, useEffect } from "react";
-import { API, graphqlOperation, Storage } from 'aws-amplify'
+import { API, graphqlOperation } from 'aws-amplify'
 import { listBooks } from '../../graphql/queries'
 import { Grid, Item, Loader } from "semantic-ui-react";
-import moment from "moment";
 import DetailsBook from "../DetailsBook";
-import Book from "../Book/Book";
+import formatListBooks from "../../helpers";
 
 
 const ListBook = (props) => {
     const [books, setbooks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const formatListBooks = (data) => {
-        const books = []
-        data.forEach(async book => {
-            const signedUrl = await Storage.get(book.picture_key);
-            books.push(new Book(book.id, 
-                book.name, 
-                book.description, 
-                signedUrl, 
-                book.category,
-                moment(book.createdAt).fromNow(),
-                {
-                    id: book.ownerId,
-                    name: book.ownerName
-                },
-                book.target.label
-            ))
-            setbooks(books)
-        });
-    }
 
     useEffect(() => {
-        fetchData(props);
+        fetchData();
     }, []);
 
-
-    async function fetchData (props) {
+    async function fetchData () {
         try {
             const results = await API.graphql(graphqlOperation(listBooks, {limit: props.limit, filter: props.filter}))
-            formatListBooks(results.data.listBooks.items)
+            const books = await formatListBooks(results.data.listBooks.items)
+            setbooks(books)
         } catch (error) {
             console.log(error)
         }finally{
@@ -56,11 +36,27 @@ const ListBook = (props) => {
                 </Grid.Column>
                 
             : <Grid.Column width={15}>
-                <Item.Group divided>
-                    {books.map(item =>
-                        <DetailsBook book={item} key={item.id}/>
-                    )}
-                </Item.Group>
+
+                {props.profile ? 
+                    <>
+                    {props.books.length === 0 && <p>You have not published book on Na Bisso</p>}
+                        <Item.Group divided>
+                            {props.books.map(item =>
+                                <DetailsBook book={item} key={item.id}/>
+                            )}
+                        </Item.Group>
+                    </>
+                :
+                <>
+                    {books.length === 0 && <p>You have not published book on Na Bisso</p>}
+                    <Item.Group divided>
+                        {books.map(item =>
+                            <DetailsBook book={item} key={item.id}/>
+                        )}
+                    </Item.Group>
+                </>
+                }
+                
             </Grid.Column>}
         </Grid.Row>
     );
@@ -68,9 +64,8 @@ const ListBook = (props) => {
 
 ListBook.defaultProps = {
     limit: 10,
-    /*filter : {
-        name: {regexp: "soir*"}
-    }*/
+    profile: false,
+    books:[]
 }
 
 export default ListBook

@@ -5,15 +5,22 @@ import { API, Auth, graphqlOperation, Storage } from 'aws-amplify'
 import { createBook } from '../../graphql/mutations'
 import { listCategories, listTargets } from "../../graphql/queries";
 import { Container, Grid, Header } from "semantic-ui-react";
+import {
+    useNavigate
+  } from "react-router-dom";
 
 const AddBook = (props) => {
-
-    const [book, setBook] = useState({
+    const initialState = {
         book_title: "",
         book_description: "",
         book_target: "",
-        book_category: ""
-    })
+        book_category: "",
+        findBook: ""
+    }
+
+    const [book, setBook] = useState(initialState)
+
+    let navigate = useNavigate();
 
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -29,17 +36,19 @@ const AddBook = (props) => {
         try{
             const result = await Storage.put(fileData.name, fileData, {contentType: fileData.type})
             const user = await Auth.currentAuthenticatedUser();
-            await API.graphql(graphqlOperation(createBook, {
+            const newBook = await API.graphql(graphqlOperation(createBook, {
                 input: {
                   name: book.book_title,
                   description: book.book_description,
                   categoryId: book.book_category,
                   picture_key: result.key,
                   targetId: book.book_target,
+                  findBook: book.findBook,
                   ownerId: user.attributes.sub,
                   ownerName: user.username
                 }
             }))
+            navigate('/books/' + newBook.data.createBook.id)
         }catch(error) {
             console.log(error)
         }finally {
@@ -59,9 +68,12 @@ const AddBook = (props) => {
     const fetchData = async() => {
         const categories = await API.graphql(graphqlOperation(listCategories))
         setCategories(categories.data.listCategories.items)
-
+        
         const targets = await API.graphql(graphqlOperation(listTargets))
         setTargets(targets.data.listTargets.items)
+
+        book['book_target'] = targets.data.listTargets.items[0].id
+        book['book_category'] = categories.data.listCategories.items[0].id
     }
 
  
@@ -110,6 +122,20 @@ const AddBook = (props) => {
                                     <option value={target.id} key={target.id}>{target.description}</option>
                                 )}
                             </SelectField>
+
+
+                            {book.book_target === "34ed9848-efad-483d-b55b-2ed858613dc1" &&
+                                <TextField
+                                    name="findBook"
+                                    padding="1rem 0"
+                                    label="Title of the book you want"
+                                    type="text"
+                                    value={book.findBook}
+                                    onChange={event => handleChange(event)}
+                                ></TextField>
+                            }
+
+
 
                             <TextField
                                 name="book_picture"

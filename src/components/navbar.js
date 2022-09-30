@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Input, Menu, Container } from 'semantic-ui-react'
+import { Menu, Container } from 'semantic-ui-react'
 import { useState } from 'react';
 
 const NavBar = (props) => {
@@ -30,16 +30,16 @@ const NavBar = (props) => {
         />
 
         <Menu.Item
-          as={Link}
-          name='dashboard'
-          content='Espace administrateur'
-          to='/dahsboard'
-          active={activeItem === 'dashboard'}
-          onClick={handleItemClick}
+            as={Link}
+            name='profile'
+            to={'/profile/' + props.user.attributes.sub}
+            content="My Profile"
+            active={activeItem === 'profile'}
+            onClick={handleItemClick}
         />
         <Menu.Menu position='right'>
           <Menu.Item>
-            <Input icon='search' placeholder='Search...' />
+            {props.user.username}
           </Menu.Item>
           <Menu.Item
             name='logout'

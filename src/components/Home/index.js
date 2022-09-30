@@ -13,13 +13,13 @@ const Home = (props) => {
                     <Grid.Column width={10}>
                         <Header as='h1'>One student, one book</Header>
                         <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.
+                        With Nabisso, you can help those most in need by offering school books that your children no longer use
                         </p>
                         <Button 
                             primary
                             as={Link}
                             to="/create-annonce"
-                        >Ajouter un livre</Button>
+                        >Add Book</Button>
                         
                     </Grid.Column>
                     <Grid.Column width={6} className="middle aligned" textAlign="center">

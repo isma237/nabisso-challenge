@@ -131,7 +131,11 @@ export const createBook = /* GraphQL */ `
         createdAt
         updatedAt
       }
+      findBook
       comments {
+        nextToken
+      }
+      discussion {
         nextToken
       }
       createdAt
@@ -167,7 +171,11 @@ export const updateBook = /* GraphQL */ `
         createdAt
         updatedAt
       }
+      findBook
       comments {
+        nextToken
+      }
+      discussion {
         nextToken
       }
       createdAt
@@ -203,7 +211,11 @@ export const deleteBook = /* GraphQL */ `
         createdAt
         updatedAt
       }
+      findBook
       comments {
+        nextToken
+      }
+      discussion {
         nextToken
       }
       createdAt
@@ -254,6 +266,183 @@ export const deleteComment = /* GraphQL */ `
       bookId
       ownerId
       ownerName
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createDiscussion = /* GraphQL */ `
+  mutation CreateDiscussion(
+    $input: CreateDiscussionInput!
+    $condition: ModelDiscussionConditionInput
+  ) {
+    createDiscussion(input: $input, condition: $condition) {
+      id
+      bookId
+      book {
+        id
+        name
+        description
+        picture_key
+        ownerId
+        ownerName
+        categoryId
+        targetId
+        findBook
+        createdAt
+        updatedAt
+      }
+      name
+      receiverId
+      senderId
+      messages {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateDiscussion = /* GraphQL */ `
+  mutation UpdateDiscussion(
+    $input: UpdateDiscussionInput!
+    $condition: ModelDiscussionConditionInput
+  ) {
+    updateDiscussion(input: $input, condition: $condition) {
+      id
+      bookId
+      book {
+        id
+        name
+        description
+        picture_key
+        ownerId
+        ownerName
+        categoryId
+        targetId
+        findBook
+        createdAt
+        updatedAt
+      }
+      name
+      receiverId
+      senderId
+      messages {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteDiscussion = /* GraphQL */ `
+  mutation DeleteDiscussion(
+    $input: DeleteDiscussionInput!
+    $condition: ModelDiscussionConditionInput
+  ) {
+    deleteDiscussion(input: $input, condition: $condition) {
+      id
+      bookId
+      book {
+        id
+        name
+        description
+        picture_key
+        ownerId
+        ownerName
+        categoryId
+        targetId
+        findBook
+        createdAt
+        updatedAt
+      }
+      name
+      receiverId
+      senderId
+      messages {
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createMessage = /* GraphQL */ `
+  mutation CreateMessage(
+    $input: CreateMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    createMessage(input: $input, condition: $condition) {
+      id
+      discussionId
+      discussion {
+        id
+        bookId
+        name
+        receiverId
+        senderId
+        createdAt
+        updatedAt
+      }
+      content
+      senderId
+      senderName
+      receiverId
+      receiverName
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateMessage = /* GraphQL */ `
+  mutation UpdateMessage(
+    $input: UpdateMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    updateMessage(input: $input, condition: $condition) {
+      id
+      discussionId
+      discussion {
+        id
+        bookId
+        name
+        receiverId
+        senderId
+        createdAt
+        updatedAt
+      }
+      content
+      senderId
+      senderName
+      receiverId
+      receiverName
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteMessage = /* GraphQL */ `
+  mutation DeleteMessage(
+    $input: DeleteMessageInput!
+    $condition: ModelMessageConditionInput
+  ) {
+    deleteMessage(input: $input, condition: $condition) {
+      id
+      discussionId
+      discussion {
+        id
+        bookId
+        name
+        receiverId
+        senderId
+        createdAt
+        updatedAt
+      }
+      content
+      senderId
+      senderName
+      receiverId
+      receiverName
       createdAt
       updatedAt
     }

@@ -1,10 +1,10 @@
 import { Button, TextAreaField, View} from "@aws-amplify/ui-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Form, Grid, Message } from "semantic-ui-react";
 const CreateComment = props => {
 
     const initialState = {content: ''}
-    const [formData, setFormData] = useState(initialState);
+    const [formData, setFormData] = useState(props.initialState);
     const [visible, setVisible] = useState(false);
 
     const setInput = (key, value) => {
@@ -14,26 +14,34 @@ const CreateComment = props => {
     const handleSubit = (e) => {
         e.preventDefault();
         setFormData(initialState)
-        props.createComment(formData)
+        if(formData.id !== undefined){
+            props.updateComment(formData)
+        }else{
+            props.createComment(formData)
+        }
+        
     }
 
     const handleDismiss = () => {
-        setTimeout(() => {
-            setVisible(true)
-        }, 2000)
+        setVisible(true)
     }
+
+    useEffect(() => {
+        setFormData(props.initialState)
+    }, [props.initialState]);
+
 
     return (
         <Container>
             <Grid with={10}>
             <Grid.Row>
                 <Grid.Column width={10}>
-                    {props.newSave &&
+                    {props.newComment &&
                         <Message
                         onDismiss={handleDismiss}
                         success
                         hidden={visible}
-                        content='Comment added'
+                        content='Comment added/saved'
                     />}
                 </Grid.Column>
             </Grid.Row>

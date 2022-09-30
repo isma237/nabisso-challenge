@@ -16,6 +16,7 @@ import { Grid } from 'semantic-ui-react';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import Books from './components/Books';
 import SingleBook from './components/SingleBook';
+import Profile from './components/Profile';
 Amplify.configure(awsconfig);
 
 
@@ -29,6 +30,7 @@ function App({signOut, user}) {
             <Routes>
                 <Route exact path="/"  element={<Home />} />
                 <Route exact path="/books"  element={<Books />} />
+                <Route exact path="/profile/:id"  element={<Profile />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/books/:id" element={<SingleBook />} />
                 <Route path="/create-annonce" element={<AddBook />} />

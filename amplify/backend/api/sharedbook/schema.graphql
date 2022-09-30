@@ -29,8 +29,10 @@ type Book @model @searchable{
 
     targetId: ID! @index(name: "byTarget")
     target: Target @belongsTo(fields : ["targetId"])
+    findBook: String
 
     comments : [Comment] @hasMany(indexName: "byComment", fields: ["id"])
+    discussion : [Discussion] @hasMany(indexName: "byDiscussion", fields: ["id"])
 }
 
 type Comment @model @searchable{
@@ -39,5 +41,27 @@ type Comment @model @searchable{
     bookId: ID! @index(name: "byComment")
     ownerId: String!
     ownerName: String!
+}
 
+
+type Discussion @model {
+    id: ID!
+    bookId: ID! @index(name: "byDiscussion")
+    book: Book @belongsTo(fields : ["bookId"])
+    name: String!
+    receiverId: String!
+    senderId: String!
+    messages: [Message] @hasMany(indexName: "byMessage", fields: ["id"])
+}
+
+type Message @model {
+    id: ID!
+    discussionId: ID! @index(name: "byMessage")
+    discussion: Discussion @belongsTo(fields : ["discussionId"])
+
+    content: String!
+    senderId: String!
+    senderName: String!
+    receiverId: String!
+    receiverName: String!
 }
